@@ -20,7 +20,23 @@ import notFoundMiddleware from "./middleware/not-found.js";
 import errorHandlerMiddleware from "./middleware/error-handler.js";
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
+import rateLimiter from "express-rate-limit";
+import helmet from "helmet";
+import xss from "xss-clean";
+import cors from "cors";
+import mongoSanitizer from "express-mongo-sanitize";
 
+app.set("trust proxy", 1);
+app.use(
+  rateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 60,
+  })
+);
+app.use(helmet());
+app.use(cors());
+app.use(xss());
+app.use(mongoSanitizer());
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
 }
